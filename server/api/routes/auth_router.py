@@ -24,6 +24,7 @@ def signup_user(request: SignUpReq, db: Session = Depends(get_db)):
     - Storing user data in the database.
     - Returning a JWT access token along with public user information.
 
+    
     Args:
         signup_info (SignupReq): Data object containing new user's registration details.
         db (Session): SQLAlchemy session object for interacting with the database.
