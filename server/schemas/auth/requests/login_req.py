@@ -2,9 +2,7 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
-class UserLoginRequest(BaseModel):
-    password: str
+class LoginReq(BaseModel):
     e164_phone_num: str
-    dial_code: int
-    national_phone_num: int
+    password: str
     last_login_at: Optional[datetime] = None

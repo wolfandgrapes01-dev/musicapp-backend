@@ -1,6 +1,6 @@
 from models.base import Base
 
-from sqlalchemy import TEXT, TIMESTAMP, VARCHAR, Column
+from sqlalchemy import TIMESTAMP, VARCHAR, Column
 
 
 class Otp(Base):
