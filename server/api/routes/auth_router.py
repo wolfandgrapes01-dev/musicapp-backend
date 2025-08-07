@@ -18,19 +18,46 @@ router = APIRouter()
 @router.post('/signup', status_code=201, response_model=AuthRes)
 def signup_user(request: SignUpReq, db: Session = Depends(get_db)):
     """
-    User signup endpoint:
-    - Accepts user registration data (name, phone number, password, etc.)
-    - Hashes the password securely
-    - Saves the user to the database
-    - Returns a clean, non-sensitive response model
+    Register a new user using the provided signup information. This includes:
+    - Validating if the phone number is already registered.
+    - Hashing the user's password.
+    - Storing user data in the database.
+    - Returning a JWT access token along with public user information.
+
+    Args:
+        signup_info (SignupReq): Data object containing new user's registration details.
+        db (Session): SQLAlchemy session object for interacting with the database.
+
+    Raises:
+        HTTPException:
+            - 409 if a user with the same phone number already exists (ERR_001).
+
+    Returns:
+        AuthRes: Object containing the JWT access token and registered user info.
     """
 
     return signup_user_service(request, db)
 
     
 @router.post('/login', status_code=200, response_model=AuthRes)
-def login_user(request: LoginReq, db: Session = Depends(get_db)):
-    
+def login_user(request: LoginReq, db: Session = Depends(get_db)):    
+    """
+    Authenticate a user based on phone number and password, update last login time,
+    and return an access token along with user information.
+
+    Args:
+        login_info (LoginReq): Object containing user's login credentials (phone number and password).
+        db (Session): SQLAlchemy database session used for querying and updating the user record.
+
+    Raises:
+        HTTPException: 
+            - 404 if user with the given phone number is not found (ERR_002).
+            - 401 if the provided password does not match the stored password (ERR_003).
+
+    Returns:
+        AuthRes: Object containing the JWT access token and authenticated user info.
+    """
+
     return login_user_service(request, db)
 
 @router.get('/')
