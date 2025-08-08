@@ -13,6 +13,7 @@ from schemas.auth.responses.user_info import UserInfo
 
 
 def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
+    
     # check if a user with same phone number already exist
     rst_user = db.query(User).filter(User.e164_phone_num == signup_info.e164_phone_num).first()
     if rst_user is not None:
@@ -43,6 +44,8 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
     # Insert (SQLAlchemy model)
     insert_user(user_record, db)
 
+    # TODO: ユーザーアカウントCreateした同時に、「Liked Music」（playList）をCreate
+
     # Construct the response model (Pydantic) with only safe, public fields
     new_user = UserInfo(
         id = user_record.id,
@@ -51,6 +54,9 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
 
     # Create access token by id
     token = jwt.encode({'id': new_user.id}, 'password_key')
+
+    # TODO: ResponseにplayListのid & nameを返す 
+    # return AuthRes(access_token = token, user = new_user, play_list(id & name))
     return AuthRes(access_token = token, user = new_user)
 
 
@@ -74,6 +80,8 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
     # Update (SQLAlchemy model)
     update_user(user_record, db)
 
+    # TODO: playList情報取得
+
     # Construct the response model (Pydantic) with only safe, public fields
     rst_user = UserInfo(
         id = user_record.id,
@@ -82,4 +90,7 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
 
     # Create access token by id
     token = jwt.encode({'id': rst_user.id}, 'password_key')
+
+    # TODO: ResponseにplayListのid & nameを返す 
+    # TODO: return AuthRes(access_token = token, user = new_user, play_list(id & name))
     return AuthRes(access_token = token, user = rst_user)
