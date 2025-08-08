@@ -1,6 +1,4 @@
-from datetime import datetime, timezone
-import bcrypt
-from fastapi import Depends, HTTPException, Header
+from fastapi import Depends, HTTPException
 from models.user import User
 from schemas.auth.requests.login_req import LoginReq
 from schemas.auth.requests.signup_req import SignUpReq
@@ -9,7 +7,6 @@ from middleware.auth_middleware import auth_middleware
 from fastapi import APIRouter
 from database import get_db
 from sqlalchemy.orm import Session
-import jwt
 
 from services.auth_service import login_user_service, signup_user_service
 
@@ -23,7 +20,6 @@ def signup_user(request: SignUpReq, db: Session = Depends(get_db)):
     - Hashing the user's password.
     - Storing user data in the database.
     - Returning a JWT access token along with public user information.
-
     
     Args:
         signup_info (SignupReq): Data object containing new user's registration details.
@@ -66,6 +62,7 @@ def current_user_data(db: Session=Depends(get_db), user_dict = Depends(auth_midd
     rst_user_info = db.query(User).filter(User.id == user_dict['uid']).first()
 
     if not rst_user_info:
+        # ERR_004
         raise HTTPException(status_code=404, detail='User not found!')
     
     return rst_user_info
