@@ -4,7 +4,7 @@ CREATE TABLE TB_001_USERS(
     password BYTEA NOT NULL,
     e164_phone_num VARCHAR(30) UNIQUE NOT NULL,
     dial_code NUMERIC(5, 0) NOT NULL,
-    national_phone_num VARCHAR(20) NOT NULL,
+    national_phone_num NUMERIC(20) NOT NULL,
     country_name VARCHAR(100) NOT NULL,
     last_login_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     create_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
