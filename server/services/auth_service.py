@@ -4,12 +4,15 @@ import bcrypt
 from fastapi import HTTPException
 import jwt
 from models.user import User
+from models.playlist import Playlist
 from sqlalchemy.orm import Session
 from repositories.user_repo import insert_user, update_user
+from repositories.playlist_repo import insert_playlist
 from schemas.auth.requests.login_req import LoginReq
 from schemas.auth.requests.signup_req import SignUpReq
 from schemas.auth.responses.auth_res import AuthRes
 from schemas.auth.responses.user_info import UserInfo
+from schemas.auth.responses.playlist_info import PlayListInfo
 
 
 def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
@@ -45,6 +48,20 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
     insert_user(user_record, db)
 
     # TODO: ユーザーアカウントCreateした同時に、「Liked Music」（playList）をCreate
+    # Create a new playlist record(SQLAlchemy model)
+    playlist_record = Playlist(
+        id = str(uuid.uuid4()),
+        name = "Liked Music",
+        user_id = user_record.id,
+        create_at = current_time,
+        update_at = current_time,
+        is_default = True,
+        # is_delete = True,
+        delete_at = current_time,
+    )
+
+    insert_playlist(playlist_record, db)
+    
 
     # Construct the response model (Pydantic) with only safe, public fields
     new_user = UserInfo(
@@ -52,12 +69,18 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
         name = user_record.name,
     )
 
+    liked_playlist = PlayListInfo(
+        id = playlist_record.id,
+        name = playlist_record.name,
+        is_default = playlist_record.is_default,
+    )
+
     # Create access token by id
     token = jwt.encode({'id': new_user.id}, 'password_key')
 
     # TODO: ResponseにplayListのid & nameを返す 
     # return AuthRes(access_token = token, user = new_user, play_list(id & name))
-    return AuthRes(access_token = token, user = new_user)
+    return AuthRes(access_token = token, user = new_user, playlist = liked_playlist)
 
 
 def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
@@ -80,7 +103,8 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
     # Update (SQLAlchemy model)
     update_user(user_record, db)
 
-    # TODO: playList情報取得
+    # TODO: playList情報取得，ユーザーID関する全てのplaylist取り出す
+    # 新規アカウントの時、create Liked music list
 
     # Construct the response model (Pydantic) with only safe, public fields
     rst_user = UserInfo(
