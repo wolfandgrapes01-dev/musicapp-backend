@@ -14,7 +14,6 @@ from schemas.auth.responses.auth_res import AuthRes
 from schemas.auth.responses.user_info import UserInfo
 from schemas.auth.responses.playlist_info import PlayListInfo
 
-
 def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
     
     # check if a user with same phone number already exist
@@ -60,8 +59,7 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
         delete_at = current_time,
     )
 
-    insert_playlist(playlist_record, db)
-    
+    insert_playlist(playlist_record, db)    
 
     # Construct the response model (Pydantic) with only safe, public fields
     new_user = UserInfo(
@@ -74,14 +72,15 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
         name = playlist_record.name,
         is_default = playlist_record.is_default,
     )
+    res_list = []
+    res_list.append(liked_playlist)
 
     # Create access token by id
     token = jwt.encode({'id': new_user.id}, 'password_key')
 
     # TODO: ResponseにplayListのid & nameを返す 
     # return AuthRes(access_token = token, user = new_user, play_list(id & name))
-    return AuthRes(access_token = token, user = new_user, playlist = liked_playlist)
-
+    return AuthRes(access_token = token, user = new_user, playlists = res_list)
 
 def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
     # Check if a user with same phone number already exist
@@ -104,7 +103,15 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
     update_user(user_record, db)
 
     # TODO: playList情報取得，ユーザーID関する全てのplaylist取り出す
-    # 新規アカウントの時、create Liked music list
+    records_list = db.query(Playlist).filter(Playlist.user_id == User.id).all()
+    res_list = []
+    for one_record in records_list:
+        rst_playlist = PlayListInfo(
+            id = one_record.id,
+            name = one_record.name,
+            is_default = one_record.is_default,
+        )
+        res_list.append(rst_playlist)
 
     # Construct the response model (Pydantic) with only safe, public fields
     rst_user = UserInfo(
@@ -117,4 +124,4 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
 
     # TODO: ResponseにplayListのid & nameを返す 
     # TODO: return AuthRes(access_token = token, user = new_user, play_list(id & name))
-    return AuthRes(access_token = token, user = rst_user)
+    return AuthRes(access_token = token, user = rst_user, playlists = res_list)

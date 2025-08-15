@@ -6,4 +6,4 @@ class AuthRes(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserInfo
-    playlist: PlayListInfo
+    playlists: list[PlayListInfo]
