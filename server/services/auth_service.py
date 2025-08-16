@@ -120,7 +120,7 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
     )
 
     # Create access token by id
-    token = jwt.encode({'id': rst_user.id}, 'password_key')
+    token = jwt.encode({'id': rst_user.id}, 'password_key', algorithms="HS256")
 
     # TODO: ResponseにplayListのid & nameを返す 
     # TODO: return AuthRes(access_token = token, user = new_user, play_list(id & name))

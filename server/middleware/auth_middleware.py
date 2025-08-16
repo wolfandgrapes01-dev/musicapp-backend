@@ -7,7 +7,7 @@ def auth_middleware(x_auth_token = Header()):
         if not x_auth_token:
             raise HTTPException(401, 'No auth token, access denied!')
         
-        verified_token = jwt.decode(x_auth_token, 'password_key', ['HS256'])
+        verified_token = jwt.decode(x_auth_token, 'password_key', algorithms=['HS256'])
         
         if not verified_token:
             raise HTTPException(401, 'Token verification faild, authrization')
