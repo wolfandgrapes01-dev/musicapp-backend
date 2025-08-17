@@ -10,6 +10,10 @@ from sqlalchemy.orm import Session
 from schemas.playlist.responses.playlist_info import PlayListInfo
 
 def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user_id:str) -> PlayListInfo:
+    # TODO: 該当するユーザーのPlaylist名の重複をチェックする
+    # TODO: 重複の場合、ERROR（detail='This playlist name is already taken. Try another one.'）
+
+
     # Get the current UTC time
     current_time = datetime.now(timezone.utc)
 
@@ -26,5 +30,8 @@ def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user
     # Insert (SQLAlchemy model)
     insert_playlist(playlist_record, db)
 
-    # return CreatePlRes(playlist_record(id & name & is_deleted))
+    # return playlist
     return PlayListInfo(id = playlist_record.id, name = playlist_record.name, is_default = playlist_record.is_deleted)
+
+
+
