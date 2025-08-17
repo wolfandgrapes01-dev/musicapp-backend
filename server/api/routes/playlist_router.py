@@ -12,11 +12,15 @@ router = APIRouter()
 
 @router.post('/create', status_code=201, response_model=PlayListInfo)
 def create_playlist(request: CreatPlayListReq, db: Session=Depends(get_db), user_dict = Depends(auth_middleware)):
-    user_id = user_dict['uid']
-    rst_user_info = db.query(User).filter(User.id == user_id).first()
-
-    if not rst_user_info:
-        # ERR_004
-        raise HTTPException(status_code=404, detail='User not found!')
     
-    return create_playlist_service(request,db,user_id)
+    # TODO: add document comment
+    return create_playlist_service(request,db,user_dict)
+
+
+# TODO: PlaylistのRename
+
+# TODO: Playlistに曲の追加（マルチ追加可能）
+
+# TODO: Playlistの曲を削除（物理削除、マルチ削除可能）
+
+# TODO: Playlistの削除（物理削除）
