@@ -5,11 +5,11 @@ from fastapi import HTTPException
 from models.playlist import Playlist
 from models.user import User
 from repositories.playlist_repo import insert_playlist
-from schemas.playlist.requests.createpl_req import CreatplReq
+from schemas.playlist.requests.create_playlist_req import CreatPlayListReq
 from sqlalchemy.orm import Session
-from schemas.playlist.responses.createPl_res import CreatePlRes
+from schemas.playlist.responses.playlist_info import PlayListInfo
 
-def create_playlist_service(create_playlist: CreatplReq, db: Session) -> CreatePlRes:
+def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> PlayListInfo:
     # Check if the ID matches the user ID
     records_list = db.query(User).filter(User.id == create_playlist.id).first()
     if not records_list:
@@ -34,4 +34,4 @@ def create_playlist_service(create_playlist: CreatplReq, db: Session) -> CreateP
     insert_playlist(playlist_record, db)
 
     # return CreatePlRes(access_token = token,play_list(id & name))
-    return CreatePlRes(playlists = playlist_record)
+    return PlayListInfo(playlists = playlist_record)

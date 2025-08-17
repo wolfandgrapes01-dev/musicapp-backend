@@ -5,5 +5,5 @@ class PlayListInfo(BaseModel):
     name: str
     is_default: bool
     # Enable Pydantic to create models from ORM objects
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
