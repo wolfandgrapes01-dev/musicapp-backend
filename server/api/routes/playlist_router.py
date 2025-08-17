@@ -10,12 +10,13 @@ from services.playlist_service import create_playlist_service
 
 router = APIRouter()
 
-@router.post('/createplaylist', status_code=201, response_model=PlayListInfo)
+@router.post('/create', status_code=201, response_model=PlayListInfo)
 def create_playlist(request: CreatPlayListReq, db: Session=Depends(get_db), user_dict = Depends(auth_middleware)):
-    rst_user_info = db.query(User).filter(User.id == user_dict['uid']).first()
+    user_id = user_dict['uid']
+    rst_user_info = db.query(User).filter(User.id == user_id).first()
 
     if not rst_user_info:
         # ERR_004
         raise HTTPException(status_code=404, detail='User not found!')
     
-    return create_playlist_service(request,db)
+    return create_playlist_service(request,db,user_id)

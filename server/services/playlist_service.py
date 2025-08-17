@@ -9,7 +9,7 @@ from schemas.playlist.requests.create_playlist_req import CreatPlayListReq
 from sqlalchemy.orm import Session
 from schemas.playlist.responses.playlist_info import PlayListInfo
 
-def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> PlayListInfo:
+def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user_id:str) -> PlayListInfo:
     # Get the current UTC time
     current_time = datetime.now(timezone.utc)
 
@@ -17,12 +17,10 @@ def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> P
     playlist_record = Playlist(
         id = str(uuid.uuid4()),
         name = create_playlist.name,
-        user_id = create_playlist.id,
+        user_id = user_id,
         create_at = current_time,
         update_at = current_time,
         is_default = False,
-        # is_delete = True,
-        delete_at = current_time,
     )
 
     # Insert (SQLAlchemy model)
