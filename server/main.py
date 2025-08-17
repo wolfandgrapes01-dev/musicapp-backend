@@ -6,6 +6,6 @@ app = FastAPI()
 
 app.include_router(auth_router.router, prefix='/auth')
 
-app.include_router(playlist_router.router, prefix='/create')
+app.include_router(playlist_router.router, prefix='/playlist')
 
 #Base.metadata.create_all(engine)

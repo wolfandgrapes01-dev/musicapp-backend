@@ -10,11 +10,6 @@ from sqlalchemy.orm import Session
 from schemas.playlist.responses.playlist_info import PlayListInfo
 
 def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> PlayListInfo:
-    # Check if the ID matches the user ID
-    records_list = db.query(User).filter(User.id == create_playlist.id).first()
-    if not records_list:
-        raise HTTPException(status_code=400, detail="User does not exist")
-
     # Get the current UTC time
     current_time = datetime.now(timezone.utc)
 
@@ -22,7 +17,7 @@ def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> P
     playlist_record = Playlist(
         id = str(uuid.uuid4()),
         name = create_playlist.name,
-        user_id = records_list.id,
+        user_id = create_playlist.id,
         create_at = current_time,
         update_at = current_time,
         is_default = False,
@@ -33,5 +28,5 @@ def create_playlist_service(create_playlist: CreatPlayListReq, db: Session) -> P
     # Insert (SQLAlchemy model)
     insert_playlist(playlist_record, db)
 
-    # return CreatePlRes(access_token = token,play_list(id & name))
-    return PlayListInfo(playlists = playlist_record)
+    # return CreatePlRes(playlist_record(id & name & is_deleted))
+    return PlayListInfo(id = playlist_record.id, name = playlist_record.name, is_default = playlist_record.is_deleted)
