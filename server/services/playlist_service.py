@@ -9,7 +9,7 @@ from schemas.playlist.requests.create_playlist_req import CreatPlayListReq
 from sqlalchemy.orm import Session
 from schemas.playlist.responses.playlist_info import PlayListInfo
 
-def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user_id:str) -> PlayListInfo:
+def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user:User) -> PlayListInfo:
     # TODO: 該当するユーザーのPlaylist名の重複をチェックする
     # TODO: 重複の場合、ERROR（detail='This playlist name is already taken. Try another one.'）
 
@@ -21,7 +21,7 @@ def create_playlist_service(create_playlist: CreatPlayListReq, db: Session, user
     playlist_record = Playlist(
         id = str(uuid.uuid4()),
         name = create_playlist.name,
-        user_id = user_id,
+        user_id = user.id,
         create_at = current_time,
         update_at = current_time,
         is_default = False,
