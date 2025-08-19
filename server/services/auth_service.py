@@ -46,7 +46,6 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
     # Insert (SQLAlchemy model)
     insert_user(user_record, db)
 
-    # TODO: ユーザーアカウントCreateした同時に、「Liked Music」（playList）をCreate
     # Create a new playlist record(SQLAlchemy model)
     playlist_record = Playlist(
         id = str(uuid.uuid4()),
@@ -55,7 +54,6 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
         create_at = current_time,
         update_at = current_time,
         is_default = True,
-        # is_delete = True,
         delete_at = current_time,
     )
 
@@ -63,9 +61,11 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
 
     # Construct the response model (Pydantic) with only safe, public fields
     new_user = UserInfo(
-        id = user_record.id,
         name = user_record.name,
     )
+
+    # Create access token by id
+    token = jwt.encode({'id': user_record.id}, 'password_key')
 
     liked_playlist = PlayListInfo(
         id = playlist_record.id,
@@ -75,10 +75,6 @@ def signup_user_service(signup_info: SignUpReq, db: Session) -> AuthRes:
     res_list = []
     res_list.append(liked_playlist)
 
-    # Create access token by id
-    token = jwt.encode({'id': new_user.id}, 'password_key')
-
-    # TODO: ResponseにplayListのid & nameを返す 
     # return AuthRes(access_token = token, user = new_user, play_list(id & name))
     return AuthRes(access_token = token, user = new_user, playlists = res_list)
 
@@ -115,13 +111,17 @@ def login_user_service(login_info: LoginReq, db: Session) -> AuthRes:
 
     # Construct the response model (Pydantic) with only safe, public fields
     rst_user = UserInfo(
-        id = user_record.id,
         name = user_record.name,
     )
 
     # Create access token by id
-    token = jwt.encode({'id': rst_user.id}, 'password_key')
+    token = jwt.encode({'id': user_record.id}, 'password_key')
 
-    # TODO: ResponseにplayListのid & nameを返す 
-    # TODO: return AuthRes(access_token = token, user = new_user, play_list(id & name))
     return AuthRes(access_token = token, user = rst_user, playlists = res_list)
+
+def current_user_service(user: User) -> UserInfo:
+    rst_user = UserInfo(
+        name = user.name,
+    )
+
+    return rst_user
