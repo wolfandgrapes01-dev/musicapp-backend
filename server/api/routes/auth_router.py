@@ -8,7 +8,7 @@ from fastapi import APIRouter
 from database import get_db
 from sqlalchemy.orm import Session
 
-from services.auth_service import login_user_service, signup_user_service
+from services.auth_service import current_user_service, login_user_service, signup_user_service
 
 router = APIRouter()
 
@@ -58,11 +58,6 @@ def login_user(request: LoginReq, db: Session = Depends(get_db)):
     return login_user_service(request, db)
 
 @router.get('/')
-def current_user_data(db: Session=Depends(get_db), user_dict = Depends(auth_middleware)):
-    rst_user_info = db.query(User).filter(User.id == user_dict['uid']).first()
-
-    if not rst_user_info:
-        # ERR_004
-        raise HTTPException(status_code=404, detail='User not found!')
+def current_user_data(user_dict = Depends(auth_middleware)):
     
-    return rst_user_info
+    return current_user_service(user_dict)
