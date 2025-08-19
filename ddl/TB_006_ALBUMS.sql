@@ -1,0 +1,16 @@
+CREATE TABLE TB_006_ALBUMS (
+    id TEXT,    
+    album_title VARCHAR(255) NOT NULL,
+    cover_url TEXT,
+    release_year INTEGER NOT NULL,
+    release_date DATE,
+    create_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    update_at TIMESTAMPTZ,
+    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    delete_at TIMESTAMPTZ
+);
+
+ALTER TABLE TB_006_ALBUMS
+ADD CONSTRAINT PK_006_ALBUMS PRIMARY KEY (id);
+
+COMMENT ON TABLE TB_006_ALBUMS IS 'アルバム';
